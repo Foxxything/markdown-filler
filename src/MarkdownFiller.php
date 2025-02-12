@@ -1,7 +1,7 @@
 <?php
 namespace Foxxything\MarkdownFiller;
 
-class MarkdownFiller
+class MarkdownFiller implements MarkdownFillerInterface
 {
     private string $fileContent;
 
