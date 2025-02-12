@@ -7,9 +7,9 @@ class MarkdownFiller implements MarkdownFillerInterface
 
     public function __construct(
         private string $filePath,
-        private FileLoaderInterface $fileLoader
+        private FileLoaderInterface $fileLoader = new FileLoader()
     ) {
-        $this->fileLoader = $fileLoader ?? new FileLoader();
+        $this->fileLoader = $fileLoader;
         $this->fileContent = $this->fileLoader->load($this->filePath);
     }
 
