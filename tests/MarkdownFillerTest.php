@@ -1,34 +1,40 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php';
 
-use PHPUnit\Framework\TestCase;
+namespace Foxxything\MarkdownFiller\Tests;
+
 use Foxxything\MarkdownFiller\MarkdownFiller;
+use Foxxything\MarkdownFiller\FileLoaderInterface;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class MarkdownFillerTest extends TestCase
 {
-    private string $testFile;
-
-    protected function setUp(): void
+    public function testReplaceVars()
     {
-        $this->testFile = __DIR__ . '/test.md';
-        file_put_contents($this->testFile, "Hello, [name]!");
-    }
+        /** @var FileLoaderInterface&MockObject $mockLoader */
+        $mockLoader = $this->createMock(FileLoaderInterface::class);
+        
+        // Mock the load() method to return fake content
+        $mockLoader->method('load')->willReturn('Hello [name]');
 
-    protected function tearDown(): void
-    {
-        unlink($this->testFile);
-    }
+        // Inject the mock into MarkdownFiller
+        $filler = new MarkdownFiller('fakepath.md', $mockLoader);
 
-    public function testFileNotFound(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        new MarkdownFiller('nonexistent.md');
-    }
-
-    public function testReplaceVars(): void
-    {
-        $filler = new MarkdownFiller($this->testFile);
+        // Test replacement
         $result = $filler->replaceVars(['name' => 'World']);
-        $this->assertEquals("Hello, World!", $result);
+        $this->assertSame('Hello World', $result);
+    }
+
+    public function testNoFile()
+    {
+        /** @var FileLoaderInterface&MockObject $mockLoader */
+        $mockLoader = $this->createMock(FileLoaderInterface::class);
+        $mockLoader->method('load')
+            ->willThrowException(new \InvalidArgumentException("File not found: fakepath.md"));
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('File not found: fakepath.md');
+
+        new MarkdownFiller('fakepath.md', $mockLoader);
     }
 }

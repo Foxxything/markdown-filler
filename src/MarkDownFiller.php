@@ -1,27 +1,20 @@
 <?php
 namespace Foxxything\MarkdownFiller;
 
-class MarkdownFiller {
+class MarkdownFiller
+{
     private string $fileContent;
 
-    public function __construct(private string $filePath) {
-        $this->loadFile();
+    public function __construct(
+        private string $filePath,
+        private FileLoaderInterface $fileLoader
+    ) {
+        $this->fileLoader = $fileLoader ?? new FileLoader();
+        $this->fileContent = $this->fileLoader->load($this->filePath);
     }
 
-    private function loadFile(): void {
-        if (!file_exists($this->filePath)) {
-            throw new \InvalidArgumentException("File not found: {$this->filePath}");
-        }
-        
-        $content = @file_get_contents($this->filePath);
-        if ($content === false) {
-            throw new \RuntimeException("Failed to read file: {$this->filePath}");
-        }
-        
-        $this->fileContent = $content;
-    }
-
-    public function replaceVars(array $variables): string {
+    public function replaceVars(array $variables): string
+    {
         foreach ($variables as $varName => $varValue) {
             $pattern = '/\[' . preg_quote($varName, '/') . '\]/';
             $this->fileContent = preg_replace($pattern, $varValue, $this->fileContent) ?? $this->fileContent;
@@ -29,7 +22,8 @@ class MarkdownFiller {
         return $this->fileContent;
     }
 
-    public function getContent(): string {
+    public function getContent(): string
+    {
         return $this->fileContent;
     }
 }
