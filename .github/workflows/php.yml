@@ -25,5 +25,12 @@ jobs:
             ${{ runner.os }}-php-
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
+        
+      - name: Dump Autoload
+        run: composer dump-autoload -o
+      
+      - name: List vendor files
+        run: ls -R vendor/
+      
       - name: Run test suite
         run: composer test
