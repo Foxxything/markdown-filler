@@ -1,6 +1,7 @@
 {
     "name": "foxxything/markdown-filler",
     "description": "A simple library to replace placeholders in Markdown files.",
+    "license": "GPL-3.0-only",
     "type": "library",
     "autoload": {
         "psr-4": {
